@@ -1,0 +1,17 @@
+{
+  "name": "floor_lav",
+  "version": "1.0.0",
+  "description": "a",
+  "main": "index.js",
+  "license": "MIT",
+  "private": null,
+  "dependencies": {
+    "express": "^4.17.1",
+    "pm2": "^4.5.0"
+  },
+
+  
+  "scripts":{
+    "start": "node ./index.js"
+  }
+}
