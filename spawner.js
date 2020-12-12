@@ -7,7 +7,13 @@ class Spawner{
     }
     spawnProjectiles(){
         for(let i=0; i<10;i++){
-            this.obstacles.push(new Obstacle(Math.floor(Math.random() * canvasX), Math.floor(Math.random() * canvasY), (Math.random() * 10) - 5, (Math.random()*10)-5), obstacles[this.obstacles.length - 1].id + 1);
+            let id = 0;
+            if(this.obstacles[i-1] != undefined){
+                id = this.obstacles[i-1].id + 1;
+            }
+            
+            this.obstacles.push(new Obstacle(Math.floor(Math.random() * this.canvasX), Math.floor(Math.random() * this.canvasY), (Math.random() * 2) -1, (Math.random() * 2)-1, id));
+            //console.log(this.obstacles[0].vx);
         }
     }
     clearObstacles(){

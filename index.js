@@ -43,7 +43,7 @@ app.get('/register', (request,response)=>{
     response.sendFile(__dirname + '/register.html');
 })
 app.post('/register',(request,response)=>{
-    console.log(request.body);
+    //console.log(request.body);
     db0.collection('Users').insertOne({username:request.body.username, password:request.body.password,position:{x:500,y:500}});
     response.redirect('/login');
 })
@@ -52,7 +52,7 @@ app.get('/login', (request,response)=>{
     response.sendFile(__dirname + '/login.html');
 })
 app.post('/login',(request,response)=>{
-    console.log(request.body);
+    //console.log(request.body);
     db0.collection('Users').findOne({username:request.body.username, password:request.body.password}).then((user)=>{
         console.log(user);
         if(user == null){
@@ -74,20 +74,24 @@ let roundManager = new RoundManager();
 const clock = new Clock(0.1);
 function tickUpdate(){
     io.emit('tick',(users));
-    if(roundManager.spawnerTime <= 0){
+    if(roundManager.spawnerTime <= 100){
+        console.log('asdasdasdads');
         io.emit('spawnObstacles', (roundManager.obstacles));
     }
 }
+function roundUpdate(){
+    roundManager.update();
+}
 
-clock.startTick([tickUpdate, roundManager.update]);
+clock.startTick([tickUpdate, roundUpdate]);
 
 io.on('connection',(socket)=>{
     console.log('client connected with ' + socket.id);
-    console.log(socket.handshake.session);
+    // console.log(socket.handshake.session);
 
     //check and see if the username in the socket handshake session object is in the db 
     db0.collection('Users').findOne({username:socket.handshake.session.username}).then((user)=>{
-        console.log(user);
+        // console.log(user);
         if(user == null){
             //oh crap how did that happen?
         }
@@ -98,7 +102,7 @@ io.on('connection',(socket)=>{
                 x:user.position.x,
                 y:user.position.y,
             }
-            console.log(player.x,player.y);
+            //console.log(player.x,player.y);
             users[player.id] = player;
             socket.emit('join',[socket.id,player.x,player.y]);
         }
@@ -116,7 +120,7 @@ io.on('connection',(socket)=>{
             
         }
         else{
-            console.log("got player move but no id :(")
+            //console.log("got player move but no id :(")
         }
     })
 

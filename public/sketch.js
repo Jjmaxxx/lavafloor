@@ -40,7 +40,7 @@ let gameCanvas = function(sketch){
         //access canvas width and height through variables width and height
         sketch.createCanvas(currWindowWidth * .90, currWindowHeight * .80);
         sketch.background(200,100,200);
-        console.log('a');
+        //console.log('a');
 
    
 
@@ -52,8 +52,9 @@ let gameCanvas = function(sketch){
             users = user;
         })
         socket.on('spawnObstacles', (obstacles)=>{
-            for(let i=0; i<obstacles[1].length; i++){
-                new Obstacle(obstacles[1][i].x,obstacles[1][i].y,obstacles[1][i].vx,obstacles[1][i].vy,obstacles[1][i].id);
+            console.log('message recieved');
+            for(let i=0; i<obstacles.length; i++){
+                new Obstacle(obstacles[i].x,obstacles[i].y,obstacles[i].vx,obstacles[i].vy,obstacles[i].id);
             }
         })
     sketch.draw = function(){
@@ -95,7 +96,7 @@ let gameCanvas = function(sketch){
         }
         playerData.x = playerX;
         playerData.y = playerY;
-        console.log(playerData.x, playerData.y, playerData.id);
+        //console.log(playerData.x, playerData.y, playerData.id);
         socket.emit('playerMove',playerData);
         
     }
@@ -104,7 +105,7 @@ let gameCanvas = function(sketch){
             this.x = x,
             this.y = y,
             this.vx = vx,
-            this.yy = vy,
+            this.vy = vy,
             this.id = id,
             obstacles.push(this);
         }
@@ -112,6 +113,16 @@ let gameCanvas = function(sketch){
             sketch.ellipse(this.x,this.y, 15);
             this.x += this.vx;
             this.y += this.vy;
+            if(this.x >= currWindowWidth * .80){
+                this.x * -1;
+            }else if(this.x <= currWindowWidth * .20){
+                this.x*-1;
+            }
+            if(this.y >= currWindowHeight * .90){
+                this.y * -1;
+            }else if(this.y <= currWindowHeight * .10){
+                this.y*-1;
+            }
         }
     }
     }
