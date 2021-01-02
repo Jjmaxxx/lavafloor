@@ -28,11 +28,17 @@ let gameCanvas = function(sketch){
     // }
     sketch.setup = function(){
         socket = io();
-        socket.on('join', (player)=>{
-            console.log(player[1],player[2]);
-            playerData.id = player[0];
-            playerX = player[1];
-            playerY = player[2];
+        socket.on('join', (fetchInfo)=>{
+            //console.log(player[1],player[2]);
+            playerData.id = fetchInfo.id;
+            playerX = fetchInfo.x;
+            playerY = fetchInfo.y;
+            console.log(fetchInfo.allObstacles);
+            for(let i=0;i<fetchInfo.allObstacles.length;i++){
+                for(let j=0; j<fetchInfo.allObstacles[i].length;j++){
+                    new Obstacle(fetchInfo.allObstacles[i][j].x,fetchInfo.allObstacles[i][j].y, fetchInfo.allObstacles[i][j].destinationX, fetchInfo.allObstacles[i][j].destinationY, fetchInfo.allObstacles[i][j].id, fetchInfo.allObstacles[i][i].speed);
+                }
+            }
             // console.log(playX,playY);
             // playerData.x = playX;
             // playerData.y = playY;
@@ -53,29 +59,34 @@ let gameCanvas = function(sketch){
         })
         socket.on('spawnObstacles', (obstacles)=>{
             console.log('message recieved');
-            for(let i=0; i<obstacles.length; i++){
-                new Obstacle(obstacles[i].x,obstacles[i].y,obstacles[i].vx,obstacles[i].vy,obstacles[i].id);
+            for(let i=0; i<obstacles.obstacle.length; i++){
+                new Obstacle(obstacles.obstacle[i].x,obstacles.obstacle[i].y,obstacles.obstacle[i].id, obstacles.obstacle[i].destinationX, obstacles.obstacle[i].destinationY, obstacles.obstacle[i].speed, obstacles.timeElapsed);
+            }
+        })
+        socket.on('obstacleTick',(timeElapsed)=>{
+            for(let i=0; i< obstacles.length; i++){
+                obstacles[i].tickUpdate(timeElapsed);
             }
         })
     sketch.draw = function(){
         sketch.background(200,100,200);
         sketch.fill(0,0,255);
         sketch.noStroke();
+        if(keyIsPressed){
+            sketch.movement();
+        }
         for(let i=0; i< obstacles.length; i++){
             obstacles[i].update();
         }
-        if(keyIsPressed){
-            sketch.movement();
-           
-        }
-
+        sketch.fill(0,0,255);
         sketch.ellipse(playerX,playerY,30);
         //foreach id in users
         //pm2 logs game pm2 stop all
   
         for(let id in users){
             if(id != socket.id ){
-                console.log(users[id]);
+                //console.log(users[id]);
+                sketch.fill(0,0,255);
                 sketch.ellipse(users[id].x,users[id].y,30);
             }    
         }
@@ -101,28 +112,39 @@ let gameCanvas = function(sketch){
         
     }
     class Obstacle{
-        constructor(x,y,vx,vy,id){
-            this.x = x,
-            this.y = y,
-            this.vx = vx,
-            this.vy = vy,
-            this.id = id,
+        constructor(x,y,id, destinationX, destinationY, speed, timeCreated){
+            this.x = x;
+            this.y = y;
+            this.id = id;
+            this.destinationX = destinationX;
+            this.destinationY = destinationY;
+            this.speed = speed;
+            this.timeCreated = timeCreated;
+            this.travelTime = dist(this.x, this.y, this.destinationX, this.destinationY)/this.speed;
             obstacles.push(this);
+            console.log('created');
         }
         update(){
+            sketch.fill(255,0,0);
             sketch.ellipse(this.x,this.y, 15);
-            this.x += this.vx;
-            this.y += this.vy;
-            if(this.x >= currWindowWidth * .80){
-                this.x * -1;
-            }else if(this.x <= currWindowWidth * .20){
-                this.x*-1;
-            }
-            if(this.y >= currWindowHeight * .90){
-                this.y * -1;
-            }else if(this.y <= currWindowHeight * .10){
-                this.y*-1;
-            }
+        }
+        // delete(){
+        //     obstacles[id].pop?
+        // }
+        tickUpdate(timeElapsed){
+            console.log(timeElapsed, this.timeCreated);
+            this.x = lerp(this.x, this.destinationX, (timeElapsed - this.timeCreated)/this.travelTime);
+            this.y = lerp(this.y, this.destinationY, (timeElapsed - this.timeCreated)/this.travelTime)
+            // if(this.x >= currWindowWidth * .80){
+            //     this.x * -1;
+            // }else if(this.x <= currWindowWidth * .20){
+            //     this.x*-1;
+            // }
+            // if(this.y >= currWindowHeight * .90){
+            //     this.y * -1;
+            // }else if(this.y <= currWindowHeight * .10){
+            //     this.y*-1;
+            // }
         }
     }
     }

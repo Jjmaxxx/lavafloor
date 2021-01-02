@@ -74,9 +74,10 @@ let roundManager = new RoundManager();
 const clock = new Clock(0.1);
 function tickUpdate(){
     io.emit('tick',(users));
+    io.emit('obstacleTick', (timeElapsed));
     if(roundManager.spawnerTime <= 100){
-        console.log('asdasdasdads');
-        io.emit('spawnObstacles', (roundManager.obstacles));
+        //console.log('asdasdasdads');
+        io.emit('spawnObstacles', {obstacle: roundManager.obstacles, timeElapsed: timeElapsed});
     }
 }
 function roundUpdate(){
@@ -84,6 +85,12 @@ function roundUpdate(){
 }
 
 clock.startTick([tickUpdate, roundUpdate]);
+
+const start = Date.now();
+var timeElapsed = 0;
+setInterval(()=>{
+    timeElapsed = Date.now() - start;
+},100)
 
 io.on('connection',(socket)=>{
     console.log('client connected with ' + socket.id);
@@ -104,7 +111,7 @@ io.on('connection',(socket)=>{
             }
             //console.log(player.x,player.y);
             users[player.id] = player;
-            socket.emit('join',[socket.id,player.x,player.y]);
+            socket.emit('join',{id: socket.id, x: player.x, y: player.y,allObstacles: roundManager.allObstacles});
         }
     });
 

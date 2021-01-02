@@ -2,9 +2,10 @@ const Spawner = require('./spawner');
 class RoundManager{
     constructor(){
         // no errors and nothing gets called probably means that all of these requires are undefined or something idk maybe connections are getting screwed
-        this.spawner = new Spawner(1000,1000,5000);
+        this.spawner = new Spawner(2500,2500,5000);
         this.spawnerTime = this.spawner.spawnTime;
         this.obstacles = this.spawner.obstacles;
+        this.allObstacles = this.spawner.allObstacles;
         // console.log(this.spawnerTime+ "dsad");
     }
     //call update through internalclock
